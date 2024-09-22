@@ -26,6 +26,8 @@ void app() {
           grid[i ^ 1][y][x] = 1;
         } else if (neigbours != 2) {
           grid[i ^ 1][y][x] = 0;
+        } else {
+          grid[i ^ 1][y][x] = grid[i][y][x];
         }
       }
   }
