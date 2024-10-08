@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 
-void useLogger(char* instruction, char* user) {
-    printf("%s <- %s\n", instruction, user);
+void useLogger(char* operand, char* instruction) {
+    printf("%s <- %s\n", operand, instruction);
 }

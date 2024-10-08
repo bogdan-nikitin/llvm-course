@@ -1,6 +1,6 @@
 ; ModuleID = 'app.c'
 source_filename = "app.c"
-target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
 target triple = "arm64-apple-macosx14.0.0"
 
 ; Function Attrs: noreturn nounwind ssp uwtable(sync)
@@ -23,7 +23,7 @@ define void @app() local_unnamed_addr #0 {
   %9 = phi i64 [ 0, %2 ], [ %15, %8 ]
   %10 = tail call i32 @simRand() #3
   %11 = srem i32 %10, 2
-  %12 = trunc i32 %11 to i8
+  %12 = trunc nsw i32 %11 to i8
   %13 = add nuw nsw i64 %9, %4
   %14 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %13
   store i8 %12, ptr %14, align 1, !tbaa !7
@@ -42,7 +42,7 @@ define void @app() local_unnamed_addr #0 {
   %23 = phi i64 [ 0, %17 ], [ %31, %30 ]
   %24 = shl nuw nsw i64 %23, 9
   %25 = add nuw nsw i64 %24, %21
-  %26 = trunc i64 %23 to i32
+  %26 = trunc nuw nsw i64 %23 to i32
   br label %33
 
 27:                                               ; preds = %30
@@ -63,7 +63,7 @@ define void @app() local_unnamed_addr #0 {
   %37 = load i8, ptr %36, align 1, !tbaa !7
   %38 = icmp eq i8 %37, 0
   %39 = select i1 %38, i32 -16777216, i32 -1
-  %40 = trunc i64 %34 to i32
+  %40 = trunc nuw nsw i64 %34 to i32
   tail call void @simPutPixel(i32 noundef %40, i32 noundef %26, i32 noundef %39) #3
   %41 = add nuw nsw i64 %34, 1
   %42 = icmp eq i64 %41, 512
@@ -210,9 +210,9 @@ declare void @simPutPixel(i32 noundef, i32 noundef, i32 noundef) local_unnamed_a
 
 declare void @simFlush(...) local_unnamed_addr #2
 
-attributes #0 = { noreturn nounwind ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #0 = { noreturn nounwind ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #1 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
-attributes #2 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #2 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #3 = { nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3}
@@ -222,7 +222,7 @@ attributes #3 = { nounwind }
 !1 = !{i32 8, !"PIC Level", i32 2}
 !2 = !{i32 7, !"uwtable", i32 1}
 !3 = !{i32 7, !"frame-pointer", i32 1}
-!4 = !{!"Homebrew clang version 18.1.8"}
+!4 = !{!"Homebrew clang version 19.1.1"}
 !5 = distinct !{!5, !6}
 !6 = !{!"llvm.loop.mustprogress"}
 !7 = !{!8, !8, i64 0}

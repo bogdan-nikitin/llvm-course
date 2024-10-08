@@ -36,15 +36,15 @@ struct MyModPass : public PassInfoMixin<MyModPass> {
           }
           builder.SetInsertPoint(&I);
           Value *opcode = builder.CreateGlobalStringPtr(I.getOpcodeName());
-          for (auto &U : I.uses()) {
-            User *user = U.getUser();
-            if (auto userInstruction = dyn_cast<Instruction>(user)) {
-              if (isPhiInstruction(*userInstruction)) {
+          for (auto &U : I.operands()) {
+            Value *use = U.get();
+            if (auto operand = dyn_cast<Instruction>(use)) {
+              if (isPhiInstruction(*operand)) {
                 continue;
               }
-              Value *userOpcode = builder.CreateGlobalStringPtr(
-                  userInstruction->getOpcodeName());
-              Value *args[] = {opcode, userOpcode};
+              Value *operandOpcode = builder.CreateGlobalStringPtr(
+                  operand->getOpcodeName());
+              Value *args[] = {operandOpcode, opcode};
               builder.CreateCall(useLogFunc, args);
             }
           }
