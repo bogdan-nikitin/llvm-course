@@ -4,7 +4,7 @@
 #include "llvm/Passes/PassPlugin.h"
 using namespace llvm;
 
-struct MyModPass : public PassInfoMixin<MyModPass> {
+struct LogPass : public PassInfoMixin<LogPass> {
 
   static bool isFuncLogger(StringRef name) { return name == "useLogger"; }
 
@@ -42,8 +42,8 @@ struct MyModPass : public PassInfoMixin<MyModPass> {
               if (isPhiInstruction(*operand)) {
                 continue;
               }
-              Value *operandOpcode = builder.CreateGlobalStringPtr(
-                  operand->getOpcodeName());
+              Value *operandOpcode =
+                  builder.CreateGlobalStringPtr(operand->getOpcodeName());
               Value *args[] = {operandOpcode, opcode};
               builder.CreateCall(useLogFunc, args);
             }
@@ -58,17 +58,14 @@ struct MyModPass : public PassInfoMixin<MyModPass> {
 PassPluginLibraryInfo getPassPluginInfo() {
   const auto callback = [](PassBuilder &PB) {
     PB.registerOptimizerLastEPCallback([&](ModulePassManager &MPM, auto) {
-      MPM.addPass(MyModPass{});
+      MPM.addPass(LogPass{});
       return true;
     });
   };
 
-  return {LLVM_PLUGIN_API_VERSION, "MyPlugin", "0.0.1", callback};
+  return {LLVM_PLUGIN_API_VERSION, "LogPlugin", "0.0.1", callback};
 };
 
-/* When a plugin is loaded by the driver, it will call this entry point to
-obtain information about this plugin and about how to register its passes.
-*/
 extern "C" LLVM_ATTRIBUTE_WEAK PassPluginLibraryInfo llvmGetPassPluginInfo() {
   return getPassPluginInfo();
 }
