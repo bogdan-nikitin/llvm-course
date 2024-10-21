@@ -33,6 +33,7 @@ int main() {
   FunctionCallee simFlushFunc =
       module->getOrInsertFunction("simFlush", simFlushType);
 
+  // declare i32 @simRand(...) local_unnamed_addr #2
   FunctionType *simRandType =
       FunctionType::get(Type::getInt32Ty(context), {voidType}, false);
   FunctionCallee simRandFunc =
