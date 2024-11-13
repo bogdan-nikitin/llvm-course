@@ -67,21 +67,20 @@ void ExtIR::buildIR(Binary &Bin) {
       builder.SetInsertPoint(BBMap[PC]);
       continue;
     } else if (I.Op == Instr::BREQ) {
-      builder.CreateCondBr(
-          builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(I.A3)),
-          BBMap[I.A1], BBMap[PC]);
+      builder.CreateCondBr(builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(I.A3)),
+                           BBMap[I.A1], BBMap[PC]);
       builder.SetInsertPoint(BBMap[PC]);
       continue;
     } else if (I.Op == Instr::BRZ) {
       builder.CreateCondBr(
-          builder.CreateICmpEQ(builder.CreateOr(LOAD_REG(I.A2), LOAD_REG(I.A3)), GEN_IMM(0)),
+          builder.CreateICmpEQ(builder.CreateOr(LOAD_REG(I.A2), LOAD_REG(I.A3)),
+                               GEN_IMM(0)),
           BBMap[I.A1], BBMap[PC]);
       builder.SetInsertPoint(BBMap[PC]);
       continue;
     } else if (I.Op == Instr::LOOP) {
-      builder.CreateCondBr(
-          builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(I.A3)),
-          BBMap[PC], BBMap[I.A1]);
+      builder.CreateCondBr(builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(I.A3)),
+                           BBMap[PC], BBMap[I.A1]);
       builder.SetInsertPoint(BBMap[PC]);
       continue;
     }
@@ -118,7 +117,7 @@ void ExtIR::executeIR(CPU &Cpu) {
   ee->InstallLazyFunctionCreator([=](const std::string &fnName) -> void * {
 #define _ISA(_Opcode, _Name, _SkipArgs, _ReadArgs, _WriteArgs, _Execute,       \
              _IRGenExecute)                                                    \
-  if (fnName == "_do_" #_Name)                                                  \
+  if (fnName == "_do_" #_Name)                                                 \
     return reinterpret_cast<void *>(CPU::do_##_Name);
 #include "include/ISA.h"
 #undef _ISA

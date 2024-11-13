@@ -13,7 +13,7 @@ struct CPU {
   uint64_t PC;
   uint64_t NextPC;
   uint64_t Run;
-  uint8_t  Stack[StackSize] = {};
+  uint8_t Stack[StackSize] = {};
   uint64_t StackPointer = 0;
   bool DumpInstrs = false;
 

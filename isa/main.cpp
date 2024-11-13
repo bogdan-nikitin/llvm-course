@@ -2,8 +2,8 @@
 #include "include/cpu.h"
 #include "include/extIR.h"
 #include "include/fullIR.h"
-#include "llvm/Support/raw_ostream.h"
 #include "llvm/ExecutionEngine/MCJIT.h"
+#include "llvm/Support/raw_ostream.h"
 using namespace llvm;
 
 int main(int argc, char *argv[]) {

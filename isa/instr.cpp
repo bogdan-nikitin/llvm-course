@@ -1,5 +1,4 @@
 #include "include/instr.h"
-#include <sstream>
 using namespace std;
 
 map<string, uint64_t> Instr::Str2Op;
