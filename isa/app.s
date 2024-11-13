@@ -36,6 +36,7 @@ y_loop_draw_end
     ADD x9 x1 
     MOV x8 x3 
     ADD x8 x1 
+    SET x4 0
 y_loop_main
     SET x5 0 
 x_loop_main
