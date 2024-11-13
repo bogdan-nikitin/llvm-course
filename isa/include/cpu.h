@@ -9,7 +9,7 @@
 struct CPU {
   static constexpr uint64_t RegSize = 16;
   static constexpr uint64_t StackSize = 512 * 512 * 2;
-  uint64_t RegFile[RegSize] = {};
+  int64_t RegFile[RegSize] = {};
   uint64_t PC;
   uint64_t NextPC;
   uint64_t Run;
@@ -24,7 +24,7 @@ struct CPU {
   static void setCPU(CPU *Cpu) { C = Cpu; }
 #define _ISA(_Opcode, _Name, _SkipArgs, _ReadArgs, _WriteArgs, _Execute,       \
              _IRGenExecute)                                                    \
-  static void do_##_Name(uint64_t A1, uint64_t A2, uint64_t A3, uint64_t A4) { \
+  static void do_##_Name(int64_t A1, int64_t A2, int64_t A3, int64_t A4) {     \
     if (C->DumpInstrs)                                                         \
       llvm::outs() << #_Name "\n";                                             \
     _Execute;                                                                  \

@@ -38,8 +38,8 @@ void ExtIR::buildIR(Binary &Bin) {
 #undef _ISA
 
   std::unordered_map<uint64_t, BasicBlock *> BBMap;
-  for (auto &BB : Bin.BBName2PC) {
-    BBMap[BB.second] = BasicBlock::Create(context, BB.first, mainFunc);
+  for (auto &BB : Bin.PC2BBName) {
+    BBMap[BB.first] = BasicBlock::Create(context, BB.second, mainFunc);
   }
 
   uint64_t PC = 0;
@@ -62,14 +62,29 @@ void ExtIR::buildIR(Binary &Bin) {
 #undef _ISA
     }
     PC++;
-    // if (I.Op == Instr::BR_COND) {
-    //   Value *reg_p = builder.CreateConstGEP2_64(regFileType, regFile, 0, I.R1);
-    //   Value *reg_i1 = builder.CreateTrunc(builder.CreateLoad(int64Type, reg_p),
-    //                                       builder.getInt1Ty());
-    //   builder.CreateCondBr(reg_i1, BBMap[I.R3Imm], BBMap[PC]);
-    //   builder.SetInsertPoint(BBMap[PC]);
-    //   continue;
-    // }
+    if (I.Op == Instr::BR) {
+      builder.CreateBr(BBMap[I.A1]);
+      builder.SetInsertPoint(BBMap[PC]);
+      continue;
+    } else if (I.Op == Instr::BREQ) {
+      builder.CreateCondBr(
+          builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(I.A3)),
+          BBMap[I.A1], BBMap[PC]);
+      builder.SetInsertPoint(BBMap[PC]);
+      continue;
+    } else if (I.Op == Instr::BRZ) {
+      builder.CreateCondBr(
+          builder.CreateICmpEQ(builder.CreateOr(LOAD_REG(I.A2), LOAD_REG(I.A3)), GEN_IMM(0)),
+          BBMap[I.A1], BBMap[PC]);
+      builder.SetInsertPoint(BBMap[PC]);
+      continue;
+    } else if (I.Op == Instr::LOOP) {
+      builder.CreateCondBr(
+          builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(I.A3)),
+          BBMap[PC], BBMap[I.A1]);
+      builder.SetInsertPoint(BBMap[PC]);
+      continue;
+    }
     auto BB = BBMap.find(PC);
     if (I.Op == Instr::EXIT) {
       builder.CreateRetVoid();
