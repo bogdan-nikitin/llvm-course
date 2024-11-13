@@ -13,10 +13,10 @@ struct Instr {
 #undef _ISA
   };
   uint64_t Op;
-  uint64_t A1;
-  uint64_t A2;
-  uint64_t A3;
-  uint64_t A4;
+  int64_t A1;
+  int64_t A2;
+  int64_t A3;
+  int64_t A4;
   static std::map<std::string, uint64_t> Str2Op;
   static std::map<uint64_t, std::string> Op2Str;
   static void prepareDicts();

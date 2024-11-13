@@ -54,7 +54,6 @@
 #define READ_2REGS {READ_REG(A1) READ_REG(A2)}
 #define READ_3REGS {READ_REG(A1) READ_REG(A2) READ_REG(A3)}
 #define READ_3REGS_IMM {READ_REG(A1) READ_REG(A2) READ_REG(A3) READ_IMM(A4)}
-#define READ_4REGS {READ_REG(A1) READ_REG(A2) READ_REG(A3) READ_REG(A4)}
 #define READ_LABEL_REG_IMM {READ_LABEL READ_REG(A2) READ_IMM(A3)}
 #define READ_2REGS_2IMMS {READ_REG(A1) READ_REG(A2) READ_IMM(A3) READ_IMM(A4)}
 #define READ_LABEL_2REGS {READ_LABEL READ_REG(A2) READ_REG(A3)}
@@ -82,8 +81,6 @@
 #define WRITE_3REGS {WRITE_REG(A1) WRITE_REG(A2) WRITE_REG(A3)}
 #define WRITE_3REGS_IMM                                                        \
   {WRITE_REG(A1) WRITE_REG(A2) WRITE_REG(A3) WRITE_IMM(A4)}
-#define WRITE_2REGS_IMM {WRITE_REG(R1) WRITE_REG(R2) WRITE_IMM}
-#define WRITE_REG_LABEL {WRITE_REG(R1) WRITE_LABEL}
 #define WRITE_LABEL_REG_IMM {WRITE_LABEL WRITE_REG(A2) WRITE_IMM(A3)}
 #define WRITE_LABEL_2REGS {WRITE_LABEL WRITE_REG(A2) WRITE_REG(A3)}
 #define WRITE_2REGS_2IMMS                                                      \
@@ -110,7 +107,7 @@ _ISA(
 _ISA(
     0x3, ALLOC, SKIP_2ARGS, READ_REG_IMM, WRITE_REG_IMM,
     {
-      C->RegFile[A1] = reinterpret_cast<uint64_t>(C->Stack + C->StackPointer);
+      C->RegFile[A1] = reinterpret_cast<int64_t>(C->Stack + C->StackPointer);
       C->StackPointer += A2;
     },
     {
@@ -123,7 +120,7 @@ _ISA(
     0x4, MOV, SKIP_2ARGS, READ_2REGS, WRITE_2REGS,
     { C->RegFile[A1] = C->RegFile[A2]; }, { STORE_REG(LOAD_REG(I.A2)); })
 
-//    SET x1 s2 (REG_IMM)
+//    SET x1 0 (REG_IMM)
 _ISA(
     0x5, SET, SKIP_2ARGS, READ_REG_IMM, WRITE_REG_IMM, { C->RegFile[A1] = A2; },
     { STORE_REG(GEN_IMM(I.A2)); })
