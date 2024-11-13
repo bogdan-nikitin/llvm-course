@@ -27,18 +27,23 @@ void FullIR::buildIR(Binary &Bin) {
       Function::Create(funcType, Function::ExternalLinkage, "main", module);
   // Funcions types
   FunctionType *voidFuncType = FunctionType::get(voidType, false);
-  ArrayRef<Type *> int64x4Types = {int64Type, int64Type, int64Type, int64Type};
-  FunctionType *int64x4FuncType =
-      FunctionType::get(voidType, int64x4Types, false);
+  ArrayRef<Type *> int64x3Types = {int64Type, int64Type, int64Type};
+  FunctionType *int64x3FuncType =
+      FunctionType::get(voidType, int64x3Types, false);
 
   // declare void @simPutPixel(i64 noundef, i64 noundef, i64 noundef)
   FunctionCallee simPutPixelFunc =
-      module->getOrInsertFunction("simPutPixel", int64x4FuncType);
+      module->getOrInsertFunction("simPutPixel", int64x3FuncType);
 
   // declare void @simFlush()
   FunctionType *simFlushType = FunctionType::get(voidType, false);
   FunctionCallee simFlushFunc =
       module->getOrInsertFunction("simFlush", simFlushType);
+
+  // declare int32 @simRand()
+  FunctionType *simRandType = FunctionType::get(builder.getInt32Ty(), false);
+  FunctionCallee simRandFunc =
+      module->getOrInsertFunction("simRand", simRandType);
 
   std::unordered_map<uint64_t, BasicBlock *> BBMap;
   for (auto &BB : Bin.BBName2PC) {
@@ -74,11 +79,14 @@ void FullIR::executeIR(CPU &Cpu) {
 
   ExecutionEngine *ee = EngineBuilder(std::unique_ptr<Module>(module)).create();
   ee->InstallLazyFunctionCreator([=](const std::string &fnName) -> void * {
-    if (fnName == "simFlush") {
+    if (fnName == "_simFlush") {
       return reinterpret_cast<void *>(simFlush);
     }
-    if (fnName == "simPutPixel") {
+    if (fnName == "_simPutPixel") {
       return reinterpret_cast<void *>(simPutPixel);
+    }
+    if (fnName == "_simRand") {
+      return reinterpret_cast<void *>(simRand);
     }
     return nullptr;
   });

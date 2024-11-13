@@ -138,8 +138,11 @@ _ISA(
 //    STORE x1 x2 (2REGS)
 _ISA(
     0x8, STORE, SKIP_2ARGS, READ_2REGS, WRITE_2REGS, 
-    { *reinterpret_cast<uint64_t*>(C->RegFile[A2]) = C->RegFile[A1]; },
-    { STORE_REG(GEP2_64(I.A2)); })
+    { *reinterpret_cast<uint8_t*>(C->RegFile[A2]) = C->RegFile[A1]; },
+    { builder.CreateStore(
+        LOAD_REG(I.A1), 
+        builder.CreateIntToPtr(LOAD_REG(I.A2), builder.getInt8Ty()->getPointerTo()));    
+    })
 
 //    INC x1 (1REG)
 _ISA(
@@ -180,7 +183,7 @@ _ISA(
 //    LOAD x1 x2 (2REGS)
 _ISA(
     0x13, LOAD, SKIP_2ARGS, READ_2REGS, WRITE_2REGS, 
-    { C->RegFile[A1] = *reinterpret_cast<uint64_t*>(C->RegFile[A2]); },
+    { C->RegFile[A1] = *reinterpret_cast<uint8_t*>(C->RegFile[A2]); },
     { STORE_REG(
         builder.CreateLoad(builder.getInt8Ty(), 
                            builder.CreateIntToPtr(LOAD_REG(I.A2), builder.getInt8Ty()->getPointerTo()))); })

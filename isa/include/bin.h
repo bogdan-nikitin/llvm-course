@@ -8,8 +8,8 @@
 
 struct Binary {
   std::vector<Instr> Instrs;
-  std::map<std::string, uint32_t> BBName2PC;
-  std::map<uint32_t, std::string> PC2BBName;
+  std::map<std::string, uint64_t> BBName2PC;
+  std::map<uint64_t, std::string> PC2BBName;
 
   bool searchBBs(std::ifstream &InputFile, std::string &ErrorMsg);
 

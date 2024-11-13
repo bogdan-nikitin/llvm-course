@@ -1,34 +1,37 @@
 entry
     ALLOC x1 262144 
     MOV x4 x1 
-    MOV x2 0 
+    SET x2 0 
 y_loop_init
-    MOV x3 0 
+    SET x3 0 
 x_loop_init
     RAND x6
     AND x6 1
     STORE x6 x4
-    ADD x4 1
+    INC x4
     LOOP x_loop_init x3 512 
+x_loop_init_end
     LOOP y_loop_init x2 256 
-    MOV x2 0 
+y_loop_init_end
+    SET x2 0 
 main_loop
     MOV x3 x2
     SHL x3 17 
-    MOV x4 0 
+    SET x4 0 
     MOV x6 x1 
-    ADD x6 x3 
 y_loop_draw
-    MOV x5 0 
-X_LOOP_DRAW
+    SET x5 0 
+x_loop_draw
     LOAD x10 x6 
-    MOVIFZ x10 x12 0xFF000000 0xFFFFFFFF 
+    MOVIFZ x12 x10 4278190080 4294967295 
     PUTPIXEL x5 x4 x12
-    ADD x6 1
+    INC x6
     LOOP x_loop_draw x5 512 
+x_loop_draw_end
     LOOP y_loop_draw x4 256 
+y_loop_draw_end
     FLUSH
-    MOVIFZ x2 x7 131072 0 
+    MOVIFZ x7 x2 131072 0 
     MOV x9 x7
     ADD x9 x1 
     MOV x8 x3 
@@ -53,7 +56,9 @@ dx_loop
     ADD x11 x15 
 loop_end
     LOOP dx_loop x13 2 
+dx_loop_end
     LOOP dy_loop x10 2 
+dy_loop_end
     BREQ live x11 3 
     BREQ remain x11 2 
     MOV x10 0
@@ -65,9 +70,12 @@ remain
     LOAD x10 x8 
 update
     STORE x10 x16 
-    ADD x8 1
-    ADD x9 1
+    INC x8
+    INC x9
     LOOP x_loop_main x5 512 
+x_loop_main_end
     LOOP y_loop_main x4 256 
+y_loop_main_end
     XOR x2 1 
     BR main_loop
+    EXIT

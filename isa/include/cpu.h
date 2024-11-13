@@ -24,7 +24,7 @@ struct CPU {
   static void setCPU(CPU *Cpu) { C = Cpu; }
 #define _ISA(_Opcode, _Name, _SkipArgs, _ReadArgs, _WriteArgs, _Execute,       \
              _IRGenExecute)                                                    \
-  static void do_##_Name(uint32_t A1, uint32_t A2, uint32_t A3, uint32_t A4) { \
+  static void do_##_Name(uint64_t A1, uint64_t A2, uint64_t A3, uint64_t A4) { \
     if (C->DumpInstrs)                                                         \
       llvm::outs() << #_Name "\n";                                             \
     _Execute;                                                                  \
