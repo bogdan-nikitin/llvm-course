@@ -8,7 +8,7 @@
 
 struct CPU {
   static constexpr uint64_t RegSize = 16;
-  static constexpr uint64_t StackSize = 512 * 512;
+  static constexpr uint64_t StackSize = 512 * 512 * 2;
   uint64_t RegFile[RegSize] = {};
   uint64_t PC;
   uint64_t NextPC;

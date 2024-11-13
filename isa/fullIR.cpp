@@ -46,8 +46,8 @@ void FullIR::buildIR(Binary &Bin) {
       module->getOrInsertFunction("simRand", simRandType);
 
   std::unordered_map<uint64_t, BasicBlock *> BBMap;
-  for (auto &BB : Bin.BBName2PC) {
-    BBMap[BB.second] = BasicBlock::Create(context, BB.first, mainFunc);
+  for (auto &BB : Bin.PC2BBName) {
+    BBMap[BB.first] = BasicBlock::Create(context, BB.second, mainFunc);
   }
 
   uint64_t PC = 0;
