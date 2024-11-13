@@ -30,7 +30,7 @@
 #define READ_IMM(Imm)                                                          \
   {                                                                            \
     InputFile >> Arg;                                                          \
-    I.Imm = std::stoi(Arg);                                                    \
+    I.Imm = std::stoll(Arg);                                                    \
   }
 #define READ_LABEL                                                             \
   {                                                                            \
@@ -88,7 +88,7 @@
 #define GEP2_64(Arg) builder.CreateConstGEP2_64(regFileType, regFile, 0, Arg)
 #define LOAD_REG(Arg) builder.CreateLoad(int64Type, GEP2_64(Arg))
 #define GEN_IMM(Arg) builder.getInt64(Arg)
-#define STORE_REG(Reg, Value) builder.CreateStore(Value, GEP2_64(Reg))
+#define STORE_REG(Arg) builder.CreateStore(Arg, GEP2_64(I.A1))
 
 // _ISA(_Opcode, _Name, _SkipArgs, _ReadArgs, _WriteArgs, _Execute,
 // _IRGenExecute)
@@ -109,43 +109,43 @@ _ISA(
       C->RegFile[A1] = reinterpret_cast<uint64_t>(C->Stack + C->StackPointer);
       C->StackPointer += A2;
     },
-    { STORE_REG(I.A1, builder.CreateAlloca(ArrayType::get(builder.getInt8Ty(), I.A2))); })
+    { STORE_REG(builder.CreateAlloca(ArrayType::get(builder.getInt8Ty(), I.A2))); })
 
 //    MOV x1 x2 (2REGS)
 _ISA(
     0x4, MOV, SKIP_2ARGS, READ_2REGS, WRITE_2REGS, 
     { C->RegFile[A1] = C->RegFile[A2]; },
-    { STORE_REG(I.A1, LOAD_REG(I.A2)); })
+    { STORE_REG(LOAD_REG(I.A2)); })
 
 //    SET x1 s2 (REG_IMM)
 _ISA(
     0x5, SET, SKIP_2ARGS, READ_REG_IMM, WRITE_REG_IMM, 
     { C->RegFile[A1] = A2; },
-    { STORE_REG(I.A1, GEN_IMM(I.A2)); })
+    { STORE_REG(GEN_IMM(I.A2)); })
 
 //    RAND x1 (1REG)
 _ISA(
     0x6, RAND, SKIP_1ARG, READ_1REG, WRITE_1REG, 
     { C->RegFile[A1] = simRand(); },
-    { builder.CreateStore(builder.CreateCall(simRandFunc), GEP2_64(I.A1)); })
+    { STORE_REG(builder.CreateCall(simRandFunc)); })
 
 //    AND x1 1 (REG_IMM)
 _ISA(
     0x7, AND, SKIP_2ARGS, READ_REG_IMM, WRITE_REG_IMM, 
     { C->RegFile[A1] &= A2; },
-    { builder.CreateStore(builder.CreateAnd(LOAD_REG(I.A1), GEN_IMM(I.A2)), GEP2_64(I.A1)); })
+    { STORE_REG(builder.CreateAnd(LOAD_REG(I.A1), GEN_IMM(I.A2))); })
 
 //    STORE x1 x2 (2REGS)
 _ISA(
     0x8, STORE, SKIP_2ARGS, READ_2REGS, WRITE_2REGS, 
     { *reinterpret_cast<uint64_t*>(C->RegFile[A2]) = C->RegFile[A1]; },
-    { builder.CreateStore(GEP2_64(I.A2), GEP2_64(I.A1)); })
+    { STORE_REG(GEP2_64(I.A2)); })
 
 //    INC x1 (1REG)
 _ISA(
     0x9, INC, SKIP_1ARG, READ_1REG, WRITE_1REG, 
     { ++C->RegFile[A1]; },
-    { builder.CreateStore(builder.CreateAdd(LOAD_REG(I.A1), GEN_IMM(1)), GEP2_64(I.A1)); })
+    { STORE_REG(builder.CreateAdd(LOAD_REG(I.A1), GEN_IMM(1))); })
 
 //    LOOP x_loop_init x3 512 (LABEL_REG_IMM)
 _ISA(
@@ -160,7 +160,7 @@ _ISA(
       builder.CreateStore(builder.CreateAdd(LOAD_REG(I.A2), GEN_IMM(1)), GEP2_64(I.A2));
       builder.CreateCondBr(
           builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(I.A3)),
-          BBMap[I.A1], BBMap[PC]);
+          BBMap[PC], BBMap[I.A1]);
       builder.SetInsertPoint(BBMap[PC]);
       continue;
     })
@@ -169,36 +169,44 @@ _ISA(
 _ISA(
     0x11, ADD, SKIP_2ARGS, READ_2REGS, WRITE_2REGS, 
     { C->RegFile[A1] += C->RegFile[A2]; },
-    { builder.CreateStore(builder.CreateAdd(LOAD_REG(I.A1), LOAD_REG(I.A2)), GEP2_64(I.A1)); })
+    { STORE_REG(builder.CreateAdd(LOAD_REG(I.A1), LOAD_REG(I.A2))); })
 
 //    SHL x1 1 (REG_IMM)
 _ISA(
     0x12, SHL, SKIP_2ARGS, READ_REG_IMM, WRITE_REG_IMM, 
     { C->RegFile[A1] <<= A2; },
-    { builder.CreateStore(builder.CreateShl(LOAD_REG(I.A1), GEN_IMM(I.A2)), GEP2_64(I.A1)); })
+    { STORE_REG(builder.CreateShl(LOAD_REG(I.A1), GEN_IMM(I.A2))); })
 
 //    LOAD x1 x2 (2REGS)
 _ISA(
     0x13, LOAD, SKIP_2ARGS, READ_2REGS, WRITE_2REGS, 
     { C->RegFile[A1] = *reinterpret_cast<uint64_t*>(C->RegFile[A2]); },
-    { builder.CreateStore(
-        builder.CreateLoad(builder.getInt64Ty(), 
-                           builder.CreateIntToPtr(LOAD_REG(I.A2), builder.getInt64Ty()->getPointerTo())),
-        GEP2_64(I.A1)); })
+    { STORE_REG(
+        builder.CreateLoad(builder.getInt8Ty(), 
+                           builder.CreateIntToPtr(LOAD_REG(I.A2), builder.getInt8Ty()->getPointerTo()))); })
 
 //    MOVIFZ x1 x2 1 2 (2REGS_2IMMS)
 _ISA(
     0x14, MOVIFZ, SKIP_4ARGS, READ_2REGS_2IMMS, WRITE_2REGS_2IMMS, 
     { C->RegFile[A2] = C->RegFile[A1] == 0 ? A3 : A4; },
-    { builder.CreateStore(
+    { STORE_REG(
         builder.CreateSelect(
-          builder.CreateICmpEq()
+          builder.CreateICmpEQ(LOAD_REG(I.A2), GEN_IMM(0)),
+          GEN_IMM(I.A3),
+          GEN_IMM(I.A4)
           )
-        ) 
-    builder.CreateStore(
-        builder.CreateLoad(builder.getInt64Ty(), 
-                           builder.CreateIntToPtr(LOAD_REG(I.A2), builder.getInt64Ty()->getPointerTo())),
-        GEP2_64(I.A1)); })
+        ); })
+
+//    PUT_PIXEL x5 x2 x6 (3REGS)
+_ISA(
+    0x15, PUTPIXEL, SKIP_3ARGS, READ_3REGS, WRITE_3REGS,
+    { simPutPixel(C->RegFile[A1], C->RegFile[A2], C->RegFile[A3]); },
+    {
+      builder.CreateCall(simPutPixelFunc,
+                         {LOAD_REG(I.A1), LOAD_REG(I.A2), LOAD_REG(I.A3)});
+      // builder.CreateCall(simPutPixelFunc,
+      //                    {LOAD_REG(I.A1), LOAD_REG(I.A2), GEN_IMM(0xFF000000)});
+    })
 // //    XOR x1 x1 x1 (3REGS)
 // _ISA(
 //     0x3, XOR, SKIP_3ARGS, READ_3REGS, WRITE_3REGS,
@@ -224,15 +232,6 @@ _ISA(
 //     {
 //       builder.CreateStore(builder.CreateSub(LOAD_REG(I.R2), GEN_IMM(I.R3Imm)),
 //                           GEP2_32(I.R1));
-//     })
-//
-// //    PUT_PIXEL x5 x2 x6 (3REGS)
-// _ISA(
-//     0x6, PUT_PIXEL, SKIP_3ARGS, READ_3REGS, WRITE_3REGS,
-//     { simPutPixel(C->RegFile[R1], C->RegFile[R2], C->RegFile[R3Imm]); },
-//     {
-//       builder.CreateCall(simPutPixelFunc,
-//                          {LOAD_REG(I.R1), LOAD_REG(I.R2), LOAD_REG(I.R3Imm)});
 //     })
 //
 // //    INC_NEi x4 x5 512 (2REGS_IMM)
