@@ -1,9 +1,9 @@
 ; ModuleID = 'app.c'
 source_filename = "app.c"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
-target triple = "arm64-apple-macosx14.0.0"
+target triple = "arm64-apple-macosx15.0.0"
 
-; Function Attrs: noreturn nounwind ssp uwtable(sync)
+; Function Attrs: noreturn nounwind optsize ssp uwtable(sync)
 define void @app() local_unnamed_addr #0 {
   %1 = alloca [262144 x i8], align 1
   call void @llvm.lifetime.start.p0(i64 262144, ptr nonnull %1) #3
@@ -21,7 +21,7 @@ define void @app() local_unnamed_addr #0 {
 
 8:                                                ; preds = %2, %8
   %9 = phi i64 [ 0, %2 ], [ %15, %8 ]
-  %10 = tail call i32 @simRand() #3
+  %10 = tail call i32 @simRand() #4
   %11 = srem i32 %10, 2
   %12 = trunc nsw i32 %11 to i8
   %13 = add nuw nsw i64 %9, %4
@@ -31,8 +31,8 @@ define void @app() local_unnamed_addr #0 {
   %16 = icmp eq i64 %15, 512
   br i1 %16, label %5, label %8, !llvm.loop !10
 
-17:                                               ; preds = %5, %63
-  %18 = phi i8 [ %64, %63 ], [ 0, %5 ]
+17:                                               ; preds = %5, %50
+  %18 = phi i8 [ %51, %50 ], [ 0, %5 ]
   %19 = zext nneg i8 %18 to i32
   %20 = shl nuw nsw i32 %19, 17
   %21 = zext nneg i32 %20 to i64
@@ -46,7 +46,7 @@ define void @app() local_unnamed_addr #0 {
   br label %33
 
 27:                                               ; preds = %30
-  tail call void @simFlush() #3
+  tail call void @simFlush() #4
   %28 = icmp eq i8 %18, 0
   %29 = select i1 %28, i64 131072, i64 0
   br label %43
@@ -64,156 +64,120 @@ define void @app() local_unnamed_addr #0 {
   %38 = icmp eq i8 %37, 0
   %39 = select i1 %38, i32 -16777216, i32 -1
   %40 = trunc nuw nsw i64 %34 to i32
-  tail call void @simPutPixel(i32 noundef %40, i32 noundef %26, i32 noundef %39) #3
+  tail call void @simPutPixel(i32 noundef %40, i32 noundef %26, i32 noundef %39) #4
   %41 = add nuw nsw i64 %34, 1
   %42 = icmp eq i64 %41, 512
   br i1 %42, label %30, label %33, !llvm.loop !12
 
-43:                                               ; preds = %27, %65
-  %44 = phi i64 [ 0, %27 ], [ %66, %65 ]
+43:                                               ; preds = %27, %55
+  %44 = phi i64 [ 0, %27 ], [ %56, %55 ]
   %45 = shl nuw nsw i64 %44, 9
   %46 = add nuw nsw i64 %45, %21
   %47 = or disjoint i64 %45, %29
   %48 = add nuw nsw i64 %45, %29
   %49 = trunc i64 %44 to i32
-  %50 = shl i32 %49, 9
-  %51 = add i32 %50, 130560
-  %52 = and i32 %51, 130560
-  %53 = or disjoint i32 %52, %20
-  %54 = trunc i64 %44 to i32
-  %55 = shl i32 %54, 9
-  %56 = and i32 %55, 130560
-  %57 = or disjoint i32 %56, %20
-  %58 = trunc i64 %44 to i32
-  %59 = shl i32 %58, 9
-  %60 = add i32 %59, 512
-  %61 = and i32 %60, 130560
-  %62 = or disjoint i32 %61, %20
-  br label %68
+  br label %52
 
-63:                                               ; preds = %65
-  %64 = xor i8 %18, 1
+50:                                               ; preds = %55
+  %51 = xor i8 %18, 1
   br label %17
 
-65:                                               ; preds = %148
-  %66 = add nuw nsw i64 %44, 1
-  %67 = icmp eq i64 %66, 256
-  br i1 %67, label %63, label %43, !llvm.loop !13
+52:                                               ; preds = %43, %96
+  %53 = phi i64 [ 0, %43 ], [ %100, %96 ]
+  %54 = trunc i64 %53 to i32
+  br label %58
 
-68:                                               ; preds = %148, %43
-  %69 = phi i64 [ 0, %43 ], [ %152, %148 ]
-  %70 = trunc i64 %69 to i32
-  %71 = add i32 %70, 511
-  %72 = and i32 %71, 511
-  %73 = or disjoint i32 %53, %72
-  %74 = zext nneg i32 %73 to i64
-  %75 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %74
-  %76 = load i8, ptr %75, align 1, !tbaa !7
-  %77 = sext i8 %76 to i32
-  %78 = trunc i64 %69 to i32
-  %79 = and i32 %78, 511
-  %80 = or disjoint i32 %53, %79
-  %81 = zext nneg i32 %80 to i64
-  %82 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %81
-  %83 = load i8, ptr %82, align 1, !tbaa !7
-  %84 = sext i8 %83 to i32
-  %85 = add nsw i32 %77, %84
-  %86 = trunc i64 %69 to i32
-  %87 = add i32 %86, 1
-  %88 = and i32 %87, 511
-  %89 = or disjoint i32 %53, %88
-  %90 = zext nneg i32 %89 to i64
-  %91 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %90
-  %92 = load i8, ptr %91, align 1, !tbaa !7
-  %93 = sext i8 %92 to i32
-  %94 = add nsw i32 %85, %93
-  %95 = trunc i64 %69 to i32
-  %96 = add i32 %95, 511
-  %97 = and i32 %96, 511
-  %98 = or disjoint i32 %57, %97
-  %99 = zext nneg i32 %98 to i64
-  %100 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %99
-  %101 = load i8, ptr %100, align 1, !tbaa !7
-  %102 = sext i8 %101 to i32
-  %103 = add nsw i32 %94, %102
-  %104 = trunc i64 %69 to i32
-  %105 = add i32 %104, 1
-  %106 = and i32 %105, 511
-  %107 = or disjoint i32 %57, %106
-  %108 = zext nneg i32 %107 to i64
-  %109 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %108
-  %110 = load i8, ptr %109, align 1, !tbaa !7
-  %111 = sext i8 %110 to i32
-  %112 = add nsw i32 %103, %111
-  %113 = trunc i64 %69 to i32
-  %114 = add i32 %113, 511
-  %115 = and i32 %114, 511
-  %116 = or disjoint i32 %62, %115
-  %117 = zext nneg i32 %116 to i64
-  %118 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %117
-  %119 = load i8, ptr %118, align 1, !tbaa !7
-  %120 = sext i8 %119 to i32
-  %121 = add nsw i32 %112, %120
-  %122 = trunc i64 %69 to i32
-  %123 = and i32 %122, 511
-  %124 = or disjoint i32 %62, %123
-  %125 = zext nneg i32 %124 to i64
-  %126 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %125
-  %127 = load i8, ptr %126, align 1, !tbaa !7
-  %128 = sext i8 %127 to i32
-  %129 = add nsw i32 %121, %128
-  %130 = trunc i64 %69 to i32
-  %131 = add i32 %130, 1
-  %132 = and i32 %131, 511
-  %133 = or disjoint i32 %62, %132
-  %134 = zext nneg i32 %133 to i64
-  %135 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %134
-  %136 = load i8, ptr %135, align 1, !tbaa !7
-  %137 = sext i8 %136 to i32
-  %138 = add nsw i32 %129, %137
-  switch i32 %138, label %141 [
-    i32 3, label %139
-    i32 2, label %143
+55:                                               ; preds = %96
+  %56 = add nuw nsw i64 %44, 1
+  %57 = icmp eq i64 %56, 256
+  br i1 %57, label %50, label %43, !llvm.loop !13
+
+58:                                               ; preds = %52, %65
+  %59 = phi i32 [ -1, %52 ], [ %66, %65 ]
+  %60 = phi i32 [ 0, %52 ], [ %84, %65 ]
+  %61 = add i32 %59, %49
+  %62 = shl i32 %61, 9
+  %63 = and i32 %62, 130560
+  br label %68
+
+64:                                               ; preds = %65
+  switch i32 %84, label %89 [
+    i32 3, label %87
+    i32 2, label %91
   ]
 
-139:                                              ; preds = %68
-  %140 = add nuw nsw i64 %69, %48
-  br label %148
+65:                                               ; preds = %83
+  %66 = add nsw i32 %59, 1
+  %67 = icmp eq i32 %66, 2
+  br i1 %67, label %64, label %58, !llvm.loop !14
 
-141:                                              ; preds = %68
-  %142 = add nuw nsw i64 %69, %48
-  br label %148
+68:                                               ; preds = %58, %83
+  %69 = phi i32 [ -1, %58 ], [ %85, %83 ]
+  %70 = phi i32 [ %60, %58 ], [ %84, %83 ]
+  %71 = or i32 %69, %59
+  %72 = icmp eq i32 %71, 0
+  br i1 %72, label %83, label %73
 
-143:                                              ; preds = %68
-  %144 = add nuw nsw i64 %69, %46
-  %145 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %144
-  %146 = load i8, ptr %145, align 1, !tbaa !7
-  %147 = or disjoint i64 %47, %69
-  br label %148
+73:                                               ; preds = %68
+  %74 = add i32 %69, %54
+  %75 = and i32 %74, 511
+  %76 = or disjoint i32 %63, %75
+  %77 = or disjoint i32 %76, %20
+  %78 = zext nneg i32 %77 to i64
+  %79 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %78
+  %80 = load i8, ptr %79, align 1, !tbaa !7
+  %81 = sext i8 %80 to i32
+  %82 = add nsw i32 %70, %81
+  br label %83
 
-148:                                              ; preds = %141, %143, %139
-  %149 = phi i64 [ %142, %141 ], [ %147, %143 ], [ %140, %139 ]
-  %150 = phi i8 [ 0, %141 ], [ %146, %143 ], [ 1, %139 ]
-  %151 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %149
-  store i8 %150, ptr %151, align 1, !tbaa !7
-  %152 = add nuw nsw i64 %69, 1
-  %153 = icmp eq i64 %152, 512
-  br i1 %153, label %65, label %68, !llvm.loop !14
+83:                                               ; preds = %68, %73
+  %84 = phi i32 [ %70, %68 ], [ %82, %73 ]
+  %85 = add nsw i32 %69, 1
+  %86 = icmp eq i32 %85, 2
+  br i1 %86, label %65, label %68, !llvm.loop !15
+
+87:                                               ; preds = %64
+  %88 = add nuw nsw i64 %53, %48
+  br label %96
+
+89:                                               ; preds = %64
+  %90 = add nuw nsw i64 %53, %48
+  br label %96
+
+91:                                               ; preds = %64
+  %92 = add nuw nsw i64 %53, %46
+  %93 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %92
+  %94 = load i8, ptr %93, align 1, !tbaa !7
+  %95 = or disjoint i64 %47, %53
+  br label %96
+
+96:                                               ; preds = %89, %91, %87
+  %97 = phi i64 [ %90, %89 ], [ %95, %91 ], [ %88, %87 ]
+  %98 = phi i8 [ 0, %89 ], [ %94, %91 ], [ 1, %87 ]
+  %99 = getelementptr inbounds [262144 x i8], ptr %1, i64 0, i64 %97
+  store i8 %98, ptr %99, align 1, !tbaa !7
+  %100 = add nuw nsw i64 %53, 1
+  %101 = icmp eq i64 %100, 512
+  br i1 %101, label %55, label %52, !llvm.loop !16
 }
 
 ; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite)
 declare void @llvm.lifetime.start.p0(i64 immarg, ptr nocapture) #1
 
+; Function Attrs: optsize
 declare i32 @simRand(...) local_unnamed_addr #2
 
+; Function Attrs: optsize
 declare void @simPutPixel(i32 noundef, i32 noundef, i32 noundef) local_unnamed_addr #2
 
+; Function Attrs: optsize
 declare void @simFlush(...) local_unnamed_addr #2
 
-attributes #0 = { noreturn nounwind ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #0 = { noreturn nounwind optsize ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #1 = { mustprogress nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
-attributes #2 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #2 = { optsize "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #3 = { nounwind }
+attributes #4 = { nounwind optsize }
 
 !llvm.module.flags = !{!0, !1, !2, !3}
 !llvm.ident = !{!4}
@@ -233,3 +197,5 @@ attributes #3 = { nounwind }
 !12 = distinct !{!12, !6}
 !13 = distinct !{!13, !6}
 !14 = distinct !{!14, !6}
+!15 = distinct !{!15, !6}
+!16 = distinct !{!16, !6}
