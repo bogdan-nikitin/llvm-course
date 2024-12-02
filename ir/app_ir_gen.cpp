@@ -216,8 +216,8 @@ int main() {
   //   %52 = and i32 %51, 130560
   Value *val52 = builder.CreateAnd(val51, builder.getInt32(130560));
   //   %53 = or disjoint i32 %52, %20
-  Value *val53 = builder.CreateOr(val52, val20); // TODO: disjoint, logical
-                                                 //   %54 = trunc i64 %44 to i32
+  Value *val53 = builder.CreateOr(val52, val20);
+  //   %54 = trunc i64 %44 to i32
   Value *val54 = builder.CreateTrunc(val44, builder.getInt32Ty());
   //   %55 = shl i32 %54, 9
   Value *val55 = builder.CreateShl(val54, builder.getInt32(9));
